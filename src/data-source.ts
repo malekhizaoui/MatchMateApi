@@ -8,8 +8,8 @@ import { TimeSlot } from "./entity/TimeSlot"
 
 export const AppDataSource = new DataSource({
     type: "postgres",
-    host:  process.env.DB_HOST,
-    port: parseInt(process.env.DB_PORT),
+    host: "localhost",
+    port: 5432,
     username: "postgres",
     password: "jesuiskiller",
     database: "postgres",
