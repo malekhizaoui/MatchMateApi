@@ -8,6 +8,7 @@ import {
   JoinTable,
   ManyToOne,
   OneToMany,
+  OneToOne,
 } from "typeorm";
 
 import { TimeSlot } from "./TimeSlot";
@@ -36,7 +37,7 @@ export class Team {
 	@JoinTable()
 	users: User[];
 
-    @OneToMany(() => TimeSlot, (timeSlot) => timeSlot.team)
-	timeSlots: TimeSlot[];
+  @OneToMany(() => TimeSlot, (timeSlot) => timeSlot.team)
+  timeSlots: TimeSlot[];
 
 }

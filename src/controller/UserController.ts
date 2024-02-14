@@ -94,42 +94,6 @@ export class UserController {
 	}
 }  
 
-async addUserToTeam(
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ) {
-    try {
-      const { teamId, userId } = request.body;
-
-      // Check if the team and user exist
-      const team = await this.teamRepository.findOne(teamId);
-      const user = await this.userRepository.findOne(userId);
-
-      if (!team || !user) {
-        response.status(404).send({
-          success: false,
-          message: "Team or user not found!",
-        });
-        return;
-      }
-
-      // Add the user to the team
-      user.teams = [...user.teams, team];
-
-      // Save changes to both entities
-      await this.userRepository.save(user);
-      
-      response.send({
-        success: true,
-        message: "User added to the team successfully!",
-      });
-    } catch (error) {
-      console.error(error);
-      response.status(500).send(error);
-    }
-  }
   
-
   
 }

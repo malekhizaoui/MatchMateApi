@@ -81,8 +81,9 @@ export class Stadium {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @OneToMany(() => TimeSlot, (timeSlot) => timeSlot.team)
+  @OneToMany(() => TimeSlot, (timeSlot) => timeSlot.stadium)
   timeSlots: TimeSlot[];
+
 
   @ManyToOne(() => Field, (field) => field.stadiums)
   @JoinTable()

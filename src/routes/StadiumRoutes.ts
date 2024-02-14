@@ -3,25 +3,25 @@ import { StadiumController } from '../controller/StadiumController';
  
 
 export const stadiumdRoutes = [
-	// {
-	// 	method: 'get',
-	// 	route: '/users',
-	// 	controller: StadiumController,
-	// 	action: 'getAllUsers',
-	// 	validation: [],
-	// 	includeVerifyToken: false,
-	// 	includeVerifyAdmin:false
+	{
+		method: 'get',
+		route: '/stadiums',
+		controller: StadiumController,
+		action: 'getAllStadiums',
+		validation: [],
+		includeVerifyToken: false,
+		includeVerifyAdmin:false
 		
-	// },
-	// {
-	// 	method: 'get',
-	// 	route: '/users/:id',
-	// 	controller: StadiumController,
-	// 	action: 'getOneUser',
-	// 	validation: [param('id').isInt()],
-	// 	includeVerifyToken: false,
-	// 	includeVerifyAdmin:false
-	// },
+	},
+	{
+		method: 'get',
+		route: '/stadium/:id',
+		controller: StadiumController,
+		action: 'getOneStadium',
+		validation: [param('id').isInt()],
+		includeVerifyToken: false,
+		includeVerifyAdmin:false
+	},
 	// {
 	// 	method: 'put',
 	// 	route: '/users/:id',

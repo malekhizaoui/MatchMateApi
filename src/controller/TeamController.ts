@@ -37,22 +37,23 @@ class TeamController {
     }
   }
 
-  async getTeamsWithUsers(
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ) {
+  async getAllTeams(request: Request, response: Response, next: NextFunction) {
     try {
-      const teams = await this.teamRepository.find({ relations: ["users"] });
+      const allTeams = await this.teamRepository
+        .createQueryBuilder("team")
+        .leftJoinAndSelect("team.timeSlots", "timeSlot")
+        .getMany();
+
       response.send({
-        success: true,
-        teams,
+        count: allTeams.length,
+        data: allTeams,
       });
     } catch (error) {
-      console.error(error);
+      Error(error);
       response.status(500).send(error);
     }
   }
+ 
 }
 
 export default TeamController;

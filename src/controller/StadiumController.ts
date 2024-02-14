@@ -5,46 +5,80 @@ import { Stadium } from "../entity/Stadium";
 export class StadiumController {
   private stadiumRepository = AppDataSource.getRepository(Stadium);
 
-//   async getAllFields(request: Request, response: Response, next: NextFunction) {
-//     try {
-//       const allFields = await this.stadiumRepository
-//         .createQueryBuilder("field")
-//         .leftJoinAndSelect("field.stadiums", "stadium")
-//         .getMany();
+  async getAllStadiums(request: Request, response: Response, next: NextFunction) {
+    try {
+      const allStadiums = await this.stadiumRepository
+        .createQueryBuilder("stadium")
+        .leftJoinAndSelect("stadium.field", "field")
+        .leftJoinAndSelect("stadium.timeSlots", "timeSlot")
+        .getMany();
 
-//       response.send({
-//         count: allFields.length,
-//         data: allFields,
-//       });
-//     } catch (error) {
-//       Error(error);
-//       response.status(500).send(error);
-//     }
-//   }
+      response.send({
+        count: allStadiums.length,
+        data: allStadiums,
+      });
+    } catch (error) {
+      Error(error);
+      response.status(500).send(error);
+    }
+  }
 
-//   async getOneField(request: Request, response: Response, next: NextFunction) {
-//     try {
-//       const id = parseInt(request.params.id);
+  async getOneStadium(request: Request, response: Response, next: NextFunction) {
+    try {
+      const id = parseInt(request.params.id);
 
-//       const oneField = await this.stadiumRepository
-//         .createQueryBuilder("field")
-//         .leftJoinAndSelect("field.stadiums", "stadium")
-//         .where("field.id = :id", { id })
-//         .getOne();
+      const oneStadium = await this.stadiumRepository
+        .createQueryBuilder("stadium")
+        .leftJoinAndSelect("stadium.field", "field")
+        .where("stadium.id = :id", { id })
+        .getOne();
 
-//       if (!oneField) {
-//         response.send({
-//           success: false,
-//           message: "Cet field n'existe pas !",
-//         });
-//       } else {
-//         response.send({ data: oneField });
-//       }
-//     } catch (error) {
-//       console.error(error);
-//       response.status(500).send(error);
-//     }
-//   }
+      if (!oneStadium) {
+        response.send({
+          success: false,
+          message: "Cet stadium n'existe pas !",
+        });
+      } else {
+        response.send({ data: oneStadium });
+      }
+    } catch (error) {
+      console.error(error);
+      response.status(500).send(error);
+    }
+  }
+
+  
+async createStadium(
+  request: Request,
+  response: Response,
+  next: NextFunction
+) {
+  try {
+    const { stadiumName, fieldId} = request.body;
+
+    const stadium = await this.stadiumRepository.findOne({
+      where: { stadiumName },
+    });
+
+    if (stadium) {
+      response.send({
+        success: false,
+        message: 'This stadium already exists in the database!',
+      });
+    } else {
+      const newStadium: any = {
+        stadiumName,
+        field: { id: fieldId }, // Assuming fieldId is passed in the request body
+        /* Add other fields as needed */
+      };
+
+      return this.stadiumRepository.save(newStadium);
+    }
+  } catch (error) {
+    console.error(error);
+    response.status(500).send(error);
+  }
+}
 
 //   async updateUserByID(
 // 	request: Request,
@@ -78,35 +112,4 @@ export class StadiumController {
 // }
 
 
-async createStadium(
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ) {
-    try {
-      const { stadiumName, fieldId} = request.body;
-
-      const stadium = await this.stadiumRepository.findOne({
-        where: { stadiumName },
-      });
-
-      if (stadium) {
-        response.send({
-          success: false,
-          message: 'This stadium already exists in the database!',
-        });
-      } else {
-        const newStadium: any = {
-          stadiumName,
-          field: { id: fieldId }, // Assuming fieldId is passed in the request body
-          /* Add other fields as needed */
-        };
-
-        return this.stadiumRepository.save(newStadium);
-      }
-    } catch (error) {
-      console.error(error);
-      response.status(500).send(error);
-    }
-  }
 }

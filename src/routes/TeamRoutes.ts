@@ -4,9 +4,9 @@ import TeamController from '../controller/TeamController';
 export const teamRoutes = [
 	{
 		method: 'get',
-		route: '/fields',
+		route: '/teams',
 		controller: TeamController,
-		action: 'getAllFields',
+		action: 'getAllTeams',
 		validation: [],
 		includeVerifyToken: false,
 		includeVerifyAdmin:false

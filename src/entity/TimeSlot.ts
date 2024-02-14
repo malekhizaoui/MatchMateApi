@@ -5,6 +5,9 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  JoinTable,
+  OneToOne,
+  OneToMany
 } from "typeorm";
 import { Team } from "./Team";
 import { Stadium } from "./Stadium";
@@ -30,8 +33,10 @@ export class TimeSlot {
   updated_at: Date;
 
   @ManyToOne(() => Team, (team) => team.timeSlots)
+  @JoinTable()
   team: Team;
 
   @ManyToOne(() => Stadium, (stadium) => stadium.timeSlots)
+  @JoinTable()
   stadium: Stadium;
 }

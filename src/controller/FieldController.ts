@@ -46,38 +46,6 @@ export class FieldController {
     }
   }
 
-  async updateUserByID(
-	request: Request,
-	response: Response,
-	next: NextFunction
-) {
-	try {
-		const id = parseInt(request.params.id);
-		const {
-			fieldName,
-			imageURL
-		} = request.body;
-
-		let fieldToUpdate = await this.fieldRepository.findOneBy({ id });
-
-		if (!fieldToUpdate) {
-			return response.status(400).json({
-				error: "user n'existe pas!!",
-			});
-		} else {
-			fieldToUpdate.fieldName = fieldName;
-			fieldToUpdate.imageURL = imageURL;
-		
-
-			return this.fieldRepository.save(fieldToUpdate);
-		}
-	} catch (error) {
-		Error(error);
-		response.status(500).send(error);
-	}
-}
-
-
 async createField(
     request: Request,
     response: Response,
@@ -92,6 +60,7 @@ async createField(
         const findield = await this.fieldRepository.findOne({
             where: { fieldName },
         });
+        
 
         if (findield) {
             response.send({
