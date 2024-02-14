@@ -21,17 +21,59 @@ export class Stadium {
   @Column()
   stadiumName: string;
 
-  @Column()
-  capacity: number;
+   @Column({
+    nullable: true,
+  })
 
-  @Column()
+  capacity: number;
+  
+   @Column({
+    nullable: true,
+  })
+
+  price: number;
+
+   @Column({
+    nullable: true,
+  })
+
   imageURL: string;
 
-  @Column()
+   @Column({
+    nullable: true,
+  })
+
   longitude: string;
 
-  @Column()
+   @Column({
+    nullable: true,
+  })
+
   latitude: string;
+
+   @Column({
+    nullable: true,
+  })
+
+  status: string;
+
+   @Column({
+    nullable: true,
+  })
+
+  isFree: boolean;
+
+   @Column({
+    nullable: true,
+  })
+
+  isInDoor: boolean;
+
+   @Column({
+    nullable: true,
+  })
+
+  isLighting: boolean;
 
   @CreateDateColumn()
   created_at: Date;

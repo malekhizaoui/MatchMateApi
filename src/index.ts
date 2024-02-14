@@ -1,5 +1,4 @@
 import { AppDataSource } from "./data-source";
-import authRouter from "./routes";
 import * as express from "express";
 import { configureRoutes } from './routesConfig';
 

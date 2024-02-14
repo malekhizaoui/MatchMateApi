@@ -27,7 +27,7 @@ import { Stadium } from "./Stadium";
     updated_at: Date;
 
     @OneToMany(() => Stadium, (stadium) => stadium.field)
-	stadiums: Stadium[];
+	  stadiums: Stadium[];
 
   }
   

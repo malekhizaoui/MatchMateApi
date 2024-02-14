@@ -1,36 +1,37 @@
 import {
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-    CreateDateColumn,
-    UpdateDateColumn,
-    ManyToOne,
-  } from "typeorm";
-  import { Team } from "./Team";
-  import { Stadium } from "./Stadium";
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+} from "typeorm";
+import { Team } from "./Team";
+import { Stadium } from "./Stadium";
 
-  @Entity()
-  export class TimeSlot {
-    @PrimaryGeneratedColumn()
-    id: number;
-  
-    @Column()
-    startTime: Date;
+@Entity()
+export class TimeSlot {
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column()
-    endTime: Date;
-  
-    @CreateDateColumn()
-    created_at: Date;
-  
-    @UpdateDateColumn()
-    updated_at: Date;
+  @Column()
+  day: string; 
 
-    @ManyToOne(() => Team, (team) => team.timeSlots)
-	team: Team;
+  @Column()
+  startTime: Date;
 
-    @ManyToOne(() => Stadium, (stadium) => stadium.timeSlots)
-	stadium: Stadium;
+  @Column()
+  endTime: Date;
 
-  }
-  
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
+
+  @ManyToOne(() => Team, (team) => team.timeSlots)
+  team: Team;
+
+  @ManyToOne(() => Stadium, (stadium) => stadium.timeSlots)
+  stadium: Stadium;
+}
