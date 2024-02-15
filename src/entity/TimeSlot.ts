@@ -7,9 +7,10 @@ import {
   ManyToOne,
   JoinTable,
   OneToOne,
-  OneToMany
+  OneToMany,
+  ManyToMany
 } from "typeorm";
-import { Team } from "./Team";
+import { User } from "./User";
 import { Stadium } from "./Stadium";
 
 @Entity()
@@ -32,9 +33,9 @@ export class TimeSlot {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @ManyToOne(() => Team, (team) => team.timeSlots)
+  @ManyToMany(() => User, (user) => user.timeSlots)
   @JoinTable()
-  team: Team;
+  team : User[];
 
   @ManyToOne(() => Stadium, (stadium) => stadium.timeSlots)
   @JoinTable()

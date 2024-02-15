@@ -9,11 +9,6 @@ import emailjs from '@emailjs/nodejs';
 
 export class AuthController {
   private userRepository = AppDataSource.getRepository(User);
-
-  constructor() {
-    console.log("repo",this.userRepository);
-    // You can initialize other properties or perform additional setup here if needed
-  }
                           
   async register(req: Request, res: Response, next: NextFunction) {
     console.log("sdmlkzdmlknazmdlk");

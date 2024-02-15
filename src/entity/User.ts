@@ -7,9 +7,10 @@ import {
   OneToMany,
   JoinTable,
   ManyToMany,
+  ManyToOne,
 } from "typeorm";
 
-import { Team } from "./Team";
+import { TimeSlot } from "./TimeSlot";
 
 @Entity()
 export class User {
@@ -64,7 +65,7 @@ export class User {
   })
   code_verification: number;
 
-  @ManyToMany(() => Team, (team) => team.users)
+  @ManyToMany(() => TimeSlot, (timeSlot) => timeSlot.team)
   @JoinTable()
-  teams: Team[];
+  timeSlots: TimeSlot[];
 }

@@ -1,12 +1,12 @@
 import { AppDataSource } from "../data-source";
 import { NextFunction, Request, Response } from "express";
 import { User } from "../entity/User";
-import { Team } from "../entity/Team";
+// import { Team } from "../entity/Team";
 import { Stadium } from "../entity/Stadium";
 import { TimeSlot } from "../entity/TimeSlot";
 export class TimeSlotsController {
   private userRepository = AppDataSource.getRepository(User);
-  private teamRepository = AppDataSource.getRepository(Team);
+  // private teamRepository = AppDataSource.getRepository(Team);
   private stadiumRepository = AppDataSource.getRepository(Stadium);
   private timeSlotRepository = AppDataSource.getRepository(TimeSlot);
 
@@ -18,7 +18,7 @@ export class TimeSlotsController {
     try {
       const allTimeSlots = await this.timeSlotRepository
         .createQueryBuilder("timeSlots")
-        .leftJoinAndSelect("timeSlots.team", "team")
+        .leftJoinAndSelect("timeSlots.team", "user")
         .leftJoinAndSelect("timeSlots.stadium", "stadium")
         .getMany();
 
@@ -108,12 +108,12 @@ export class TimeSlotsController {
     next: NextFunction
   ) {
     try {
-      const { teamId, stadiumId, day, startTime, endTime } = request.body;
-
+      const {stadiumId, day, startTime, endTime } = request.body;
       const stadium = await this.stadiumRepository.findOneBy(stadiumId);
-      const team = await this.stadiumRepository.findOneBy(teamId);
+      // const team = await this.teamRepository.findOneBy(teamId);
 
-      if (!stadium || !team) {
+      if (!stadium ) {
+        
         response.send({
           success: false,
           message: "This stadium and team does not exist in the database!",
@@ -123,7 +123,6 @@ export class TimeSlotsController {
           day,
           startTime,
           endTime,
-          team: { id: teamId }, // Assuming fieldId is passed in the request body
           stadium: { id: stadiumId }, // Assuming fieldId is passed in the request body
           /* Add other fields as needed */
         };

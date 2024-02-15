@@ -72,7 +72,6 @@ export class Stadium {
    @Column({
     nullable: true,
   })
-
   isLighting: boolean;
 
   @CreateDateColumn()
