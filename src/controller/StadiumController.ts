@@ -64,7 +64,23 @@ export class StadiumController {
     next: NextFunction
   ) {
     try {
-      const { stadiumName, fieldId } = request.body;
+      const {
+        stadiumName,
+        fieldId,
+        capacity,
+        price,
+        numberOfCourts,
+        numberOfHoops,
+        imageURL,
+        longitude,
+        latitude,
+        status,
+        Region,
+        isFree,
+        isInDoor,
+        hasLighting,
+        hasShower,
+      } = request.body;
 
       const stadium = await this.stadiumRepository.findOne({
         where: { stadiumName },
@@ -78,7 +94,20 @@ export class StadiumController {
       } else {
         const newStadium: any = {
           stadiumName,
-          field: { id: fieldId }, // Assuming fieldId is passed in the request body
+          field: { id: fieldId },
+          capacity,
+          price,
+          numberOfCourts,
+          numberOfHoops,
+          imageURL,
+          longitude,
+          latitude,
+          status,
+          Region,
+          isFree,
+          isInDoor,
+          hasLighting,
+          hasShower, // Assuming fieldId is passed in the request body
           /* Add other fields as needed */
         };
 

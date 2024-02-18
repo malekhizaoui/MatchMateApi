@@ -6,12 +6,11 @@ import {
   UpdateDateColumn,
   OneToMany,
   ManyToOne,
-  JoinTable
+  JoinTable,
 } from "typeorm";
 
 import { TimeSlot } from "./TimeSlot";
 import { Field } from "./Field";
-
 
 @Entity()
 export class Stadium {
@@ -21,58 +20,66 @@ export class Stadium {
   @Column()
   stadiumName: string;
 
-   @Column({
+  @Column({
     nullable: true,
   })
-
   capacity: number;
-  
-   @Column({
+
+  @Column({
     nullable: true,
   })
-
   price: number;
-
-   @Column({
+  @Column({
     nullable: true,
   })
+  numberOfCourts: number;
+  @Column({
+    nullable: true,
+  })
+  numberOfHoops: number;
 
+  @Column({
+    nullable: true,
+  })
   imageURL: string;
 
-   @Column({
+  @Column({
     nullable: true,
   })
-
   longitude: string;
 
-   @Column({
+  @Column({
     nullable: true,
   })
-
   latitude: string;
 
-   @Column({
+  @Column({
     nullable: true,
   })
-
   status: string;
-
-   @Column({
+  @Column({
     nullable: true,
   })
+  Region: string;
 
+  @Column({
+    nullable: true,
+  })
   isFree: boolean;
 
-   @Column({
+  @Column({
     nullable: true,
   })
-
   isInDoor: boolean;
 
-   @Column({
+  @Column({
     nullable: true,
   })
-  isLighting: boolean;
+  hasLighting: boolean;
+  @Column({
+    nullable: true,
+  })
+  hasShower: boolean;
 
   @CreateDateColumn()
   created_at: Date;
@@ -82,7 +89,6 @@ export class Stadium {
 
   @OneToMany(() => TimeSlot, (timeSlot) => timeSlot.stadium)
   timeSlots: TimeSlot[];
-
 
   @ManyToOne(() => Field, (field) => field.stadiums)
   @JoinTable()
