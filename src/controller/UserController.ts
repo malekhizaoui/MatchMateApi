@@ -136,13 +136,13 @@ export class UserController {
     try {
       const {
         userId,
-      } = request.body;
+      } = request.params;
       // Find the user and team by their IDs
-      const user = await this.userRepository.findOne({ where: { id: userId } });
+      const user = await this.userRepository.findOne({ where: { id: Number(userId) } });
      
       response.send({
           success: false,
-          data: "user",
+          data: user,
         })
     } catch (error) {
       console.error("Error adding user to team:", error);

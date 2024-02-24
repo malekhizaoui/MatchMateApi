@@ -1,12 +1,10 @@
 import { AppDataSource } from "../data-source";
 import { NextFunction, Request, Response } from "express";
 import { User } from "../entity/User";
-// import { Team } from "../entity/Team";
 import { Stadium } from "../entity/Stadium";
 import { TimeSlot } from "../entity/TimeSlot";
 export class TimeSlotsController {
   private userRepository = AppDataSource.getRepository(User);
-  // private teamRepository = AppDataSource.getRepository(Team);
   private stadiumRepository = AppDataSource.getRepository(Stadium);
   private timeSlotRepository = AppDataSource.getRepository(TimeSlot);
 
@@ -110,7 +108,6 @@ export class TimeSlotsController {
     try {
       const {stadiumId, day, startTime, endTime } = request.body;
       const stadium = await this.stadiumRepository.findOneBy(stadiumId);
-      // const team = await this.teamRepository.findOneBy(teamId);
 
       if (!stadium ) {
         

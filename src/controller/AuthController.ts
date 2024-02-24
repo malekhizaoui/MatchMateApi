@@ -85,7 +85,7 @@ export class AuthController {
 					message: 'Adresse e-mail nexiste pas!.',
 				});
 			} else {
-				if (!findUser.is_verified) {
+				if (findUser.is_verified) {
 					response.send({
 						success: false,
 						message: 'Adresse email non vérifiée!',

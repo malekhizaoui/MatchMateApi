@@ -1,9 +1,10 @@
 import { AppDataSource } from "../data-source";
 import { NextFunction, Request, Response } from "express";
 import { Stadium } from "../entity/Stadium";
-
+import { TimeSlot } from "../entity/TimeSlot";
 export class StadiumController {
   private stadiumRepository = AppDataSource.getRepository(Stadium);
+  private timeSlotRepositroy=  AppDataSource.getRepository(TimeSlot);
 
   async getAllStadiums(
     request: Request,
@@ -11,6 +12,8 @@ export class StadiumController {
     next: NextFunction
   ) {
     try {
+      console.log("lzdjh");
+      
       const allStadiums = await this.stadiumRepository
         .createQueryBuilder("stadium")
         .leftJoinAndSelect("stadium.field", "field")
@@ -28,6 +31,44 @@ export class StadiumController {
     }
   }
 
+  async updateTimeSlotStadiums() {
+    try {      
+      const allStadiums = await this.stadiumRepository
+        .createQueryBuilder("stadium")
+        .leftJoinAndSelect("stadium.field", "field")
+        .leftJoinAndSelect("stadium.timeSlots", "timeSlot")
+        .leftJoinAndSelect("timeSlot.team", "user")
+        .getMany();
+      
+        for (const stadium of allStadiums) {
+          for (const timeSlot of stadium.timeSlots) {
+            const timeOfEndingGame = timeSlot.endTime.getDay();
+            const now = new Date();
+            const currentTime = now.getDay();
+  
+            if ( currentTime- timeOfEndingGame> 0) {
+              timeSlot.startTime.setDate(timeSlot.startTime.getDate() + 7);
+              timeSlot.endTime.setDate(timeSlot.endTime.getDate() + 7);  
+              let TimeSlotRecreate = await this.timeSlotRepositroy.findOneBy({ id: timeSlot.id });
+              await this.timeSlotRepositroy.remove(TimeSlotRecreate);
+  
+              const newTimeSlot: any = {
+                day: timeSlot.day,
+                startTime: timeSlot.startTime,
+                endTime: timeSlot.endTime,
+                stadium: { id: stadium.id },
+              };
+  
+              await this.timeSlotRepositroy.save(newTimeSlot);
+            }
+          }
+        }
+
+
+    } catch (error) {
+      Error(error);
+    }
+  }
   async getOneStadium(
     request: Request,
     response: Response,
@@ -50,7 +91,8 @@ export class StadiumController {
           message: "Cet stadium n'existe pas !",
         });
       } else {
-        response.send({ data: oneStadium });
+
+        response.send({ data: oneStadium});
       }
     } catch (error) {
       console.error(error);
@@ -119,33 +161,7 @@ export class StadiumController {
     }
   }
 
-  //   async updateUserByID(
-  // 	request: Request,
-  // 	response: Response,
-  // 	next: NextFunction
-  // ) {
-  // 	try {
-  // 		const id = parseInt(request.params.id);
-  // 		const {
-  // 			fieldName,
-  // 			imageURL
-  // 		} = request.body;
 
-  // 		let fieldToUpdate = await this.stadiumRepository.findOneBy({ id });
-
-  // 		if (!fieldToUpdate) {
-  // 			return response.status(400).json({
-  // 				error: "user n'existe pas!!",
-  // 			});
-  // 		} else {
-  // 			fieldToUpdate.fieldName = fieldName;
-  // 			fieldToUpdate.imageURL = imageURL;
-
-  // 			return this.stadiumRepository.save(fieldToUpdate);
-  // 		}
-  // 	} catch (error) {
-  // 		Error(error);
-  // 		response.status(500).send(error);
-  // 	}
-  // }
 }
+
+export default new StadiumController();
