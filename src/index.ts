@@ -6,9 +6,9 @@ import * as schedule from 'node-schedule';
 import stadiumController from "./controller/StadiumController";
 
 async function runScheduledTask() {
-  try {
-    console.log("timeSlotUpdated");
-    
+  console.log("skn");
+  
+  try {    
     await stadiumController.updateTimeSlotStadiums();
   } catch (error) {
     console.error('Error in scheduled task:', error);
@@ -32,7 +32,7 @@ AppDataSource.initialize()
       console.log(`Server is running on port ${port}`);
     });
 
-    const job = schedule.scheduleJob('1 12 * * *', runScheduledTask);
+    const job = schedule.scheduleJob('33 13 * * *', runScheduledTask);
 
   })
   .catch((error) => {

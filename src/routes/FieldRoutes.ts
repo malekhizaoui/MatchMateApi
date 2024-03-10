@@ -15,31 +15,22 @@ export const fieldRoutes = [
 	},
 	{
 		method: 'get',
-		route: '/fields/:id',
+		route: '/field/:id',
 		controller: FieldController,
 		action: 'getOneField',
 		validation: [param('id').isInt()],
 		includeVerifyToken: false,
 		includeVerifyAdmin:false
 	},
-	// {
-	// 	method: 'put',
-	// 	route: '/users/:id',
-	// 	controller: UserController,
-	// 	action: 'updateUserByID',
-	// 	validation: [param('id').isInt()],
-	// 	includeVerifyToken: false,
-	// 	includeVerifyAdmin:false
-	// },
-	// {
-	// 	method: 'put',
-	// 	route: '/newVisited/:id',
-	// 	controller: UserController,
-	// 	action: 'monumentVisitedByUser',
-	// 	validation: [param('id').isInt()],
-	// 	includeVerifyToken: false,
-	// 	includeVerifyAdmin:false
-	// },
+	{
+		method: 'put',
+		route: '/field/:id',
+		controller: FieldController,
+		action: 'updateField',
+		validation: [param('id').isInt()],
+		includeVerifyToken: false,
+		includeVerifyAdmin:false
+	},
 	{
 		method: 'post',
 		route: '/field',
@@ -49,14 +40,14 @@ export const fieldRoutes = [
 		includeVerifyToken: false,
 		includeVerifyAdmin:false
 	},
-	// {
-	// 	method: 'delete',
-	// 	route: '/feedback/remove/:id',
-	// 	controller: UserController,
-	// 	action: 'deleteFeedback',
-	// 	validation: [param('id').isInt()],
-	// 	includeVerifyToken: false,
-	// 	includeVerifyAdmin:false
+	{
+		method: 'delete',
+		route: '/field/remove/:id',
+		controller: FieldController,
+		action: 'deleteFeedback',
+		validation: [param('id').isInt()],
+		includeVerifyToken: false,
+		includeVerifyAdmin:false
 
-	// },
+	},
 ];

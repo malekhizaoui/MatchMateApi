@@ -4,7 +4,8 @@ import { User } from "./entity/User"
 import { Field } from "./entity/Field"
 import { Stadium } from "./entity/Stadium"
 import { TimeSlot } from "./entity/TimeSlot"
-
+import { GameHistory } from "./entity/GameHistory"
+import { ImageStadium } from "./entity/ImageStadium"
 export const AppDataSource = new DataSource({
     type: "postgres",
     host: "localhost",
@@ -14,7 +15,7 @@ export const AppDataSource = new DataSource({
     database: "postgres",
     synchronize: true,
     logging: false,
-    entities: [User,Field,Stadium,TimeSlot],
+    entities: [User,Field,Stadium,TimeSlot,GameHistory,ImageStadium],
     migrations: [],
     subscribers: [],
 })

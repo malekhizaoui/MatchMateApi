@@ -9,9 +9,8 @@ import {
   ManyToMany,
   ManyToOne,
 } from "typeorm";
-
+import { GameHistory } from "./GameHistory";
 import { TimeSlot } from "./TimeSlot";
-
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
@@ -68,4 +67,11 @@ export class User {
   @ManyToMany(() => TimeSlot, (timeSlot) => timeSlot.team)
   @JoinTable()
   timeSlots: TimeSlot[];
+
+ // User entity
+@ManyToMany(type => GameHistory, gameHistory => gameHistory.team, { cascade: ['insert', 'update'] })
+@JoinTable()
+gameHistories: GameHistory[];
+
+
 }

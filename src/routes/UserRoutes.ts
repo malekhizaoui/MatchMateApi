@@ -24,39 +24,21 @@ export const userRoutes = [
 	},
 	{
 		method: 'put',
-		route: '/users/:id',
+		route: '/user/:id',
 		controller: UserController,
-		action: 'updateUserByID',
+		action: 'updateUser',
 		validation: [param('id').isInt()],
 		includeVerifyToken: false,
 		includeVerifyAdmin:false
 	},
-	// {
-	// 	method: 'put',
-	// 	route: '/newVisited/:id',
-	// 	controller: UserController,
-	// 	action: 'monumentVisitedByUser',
-	// 	validation: [param('id').isInt()],
-	// 	includeVerifyToken: false,
-	// 	includeVerifyAdmin:false
-	// },
 	{
-		method: 'put',
-		route: '/teamUser',
+		method: 'delete',
+		route: '/user/remove/:id',
 		controller: UserController,
-		action: 'addUserToTeam',
-		validation: [],
+		action: 'deleteUser',
+		validation: [param('id').isInt()],
 		includeVerifyToken: false,
 		includeVerifyAdmin:false
-	},
-	// {
-	// 	method: 'delete',
-	// 	route: '/feedback/remove/:id',
-	// 	controller: UserController,
-	// 	action: 'deleteFeedback',
-	// 	validation: [param('id').isInt()],
-	// 	includeVerifyToken: false,
-	// 	includeVerifyAdmin:false
 
-	// },
+	},
 ];

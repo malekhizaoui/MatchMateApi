@@ -2,9 +2,14 @@ import { AppDataSource } from "../data-source";
 import { NextFunction, Request, Response } from "express";
 import { Stadium } from "../entity/Stadium";
 import { TimeSlot } from "../entity/TimeSlot";
+import { ImageStadium } from "../entity/ImageStadium";
+import { GameHistory } from "../entity/GameHistory";
+import { User } from "../entity/User";
 export class StadiumController {
   private stadiumRepository = AppDataSource.getRepository(Stadium);
-  private timeSlotRepositroy=  AppDataSource.getRepository(TimeSlot);
+  private timeSlotRepositroy = AppDataSource.getRepository(TimeSlot);
+  private userRepositroy = AppDataSource.getRepository(User);
+  private gameHistoryRepositroy = AppDataSource.getRepository(GameHistory);
 
   async getAllStadiums(
     request: Request,
@@ -12,13 +17,14 @@ export class StadiumController {
     next: NextFunction
   ) {
     try {
-      console.log("lzdjh");
-      
+
       const allStadiums = await this.stadiumRepository
         .createQueryBuilder("stadium")
         .leftJoinAndSelect("stadium.field", "field")
+        .leftJoinAndSelect("stadium.stadiumImages", "imageStadium")
         .leftJoinAndSelect("stadium.timeSlots", "timeSlot")
         .leftJoinAndSelect("timeSlot.team", "user")
+        .orderBy("timeSlot.endTime", "ASC")  // Order by date in descending order
         .getMany();
 
       response.send({
@@ -27,48 +33,270 @@ export class StadiumController {
       });
     } catch (error) {
       Error(error);
+      console.log("err",error);
+      
       response.status(500).send(error);
     }
   }
 
+  // async updateTimeSlotStadiums() {
+  //   try {
+  //     const allStadiums = await this.stadiumRepository
+  //       .createQueryBuilder("stadium")
+  //       .leftJoinAndSelect("stadium.field", "field")
+  //       .leftJoinAndSelect("stadium.timeSlots", "timeSlot")
+  //       .leftJoinAndSelect("timeSlot.team", "user")
+  //       .getMany();
+
+  //     for (const stadium of allStadiums) {
+  //       for (const timeSlot of stadium.timeSlots) {
+  //         const timeOfEndingGame = new Date(timeSlot.endTime);
+  //         const currentTime = new Date();
+  //         timeOfEndingGame.setHours(0, 0, 0, 0);
+  //         currentTime.setHours(0, 0, 0, 0);
+
+  //         if (currentTime > timeOfEndingGame) {    
+             
+  //           for (const user of timeSlot.team) {
+  //             // Remove the relationship between TimeSlot and User
+  //             await this.userRepositroy
+  //               .createQueryBuilder()
+  //               .relation(User, "timeSlots")
+  //               .of(user)
+  //               .remove(timeSlot);
+  //           }       
+  //           // this.gameHistoryRepositroy.save(newGameHistory).then(async()=>{                
+  //             timeSlot.startTime.setDate(timeSlot.startTime.getDate() + 7);
+  //             timeSlot.endTime.setDate(timeSlot.endTime.getDate() + 7);
+  //             // let TimeSlotRecreate = await this.timeSlotRepositroy.findOneBy({
+  //             //   id: timeSlot.id,
+  //             // });
+  //             try {
+  //               console.log("here");
+                
+  //               await this.timeSlotRepositroy.remove(timeSlot);
+
+  //               const newTimeSlot: any = {
+  //                 day: timeSlot.day,
+  //                 startTime: timeSlot.startTime,
+  //                 endTime: timeSlot.endTime,
+  //                 stadium: { id: stadium.id },
+  //               };
+  
+  //               await this.timeSlotRepositroy.save(newTimeSlot);
+  //             } catch (error) {
+  //               console.log("err",error);
+                
+  //             }
+            
+  //           // })
+  //           // .catch(error => {
+  //           //   console.error("Error saving newGameHistory:", error);
+  //           // });
+
+
+  //         }
+  //       }
+  //     }
+  //   } catch (error) {
+  //     Error(error);
+  //   }
+  // }
+
   async updateTimeSlotStadiums() {
-    try {      
-      const allStadiums = await this.stadiumRepository
-        .createQueryBuilder("stadium")
-        .leftJoinAndSelect("stadium.field", "field")
-        .leftJoinAndSelect("stadium.timeSlots", "timeSlot")
-        .leftJoinAndSelect("timeSlot.team", "user")
-        .getMany();
-      
-        for (const stadium of allStadiums) {
-          for (const timeSlot of stadium.timeSlots) {
-            const timeOfEndingGame = timeSlot.endTime.getDay();
-            const now = new Date();
-            const currentTime = now.getDay();
+    try {
+      const allStadiums = await this.getAllStadiumsWithTimeSlots();
   
-            if ( currentTime- timeOfEndingGame> 0) {
-              timeSlot.startTime.setDate(timeSlot.startTime.getDate() + 7);
-              timeSlot.endTime.setDate(timeSlot.endTime.getDate() + 7);  
-              let TimeSlotRecreate = await this.timeSlotRepositroy.findOneBy({ id: timeSlot.id });
-              await this.timeSlotRepositroy.remove(TimeSlotRecreate);
+      for (const stadium of allStadiums) {
+        for (const timeSlot of stadium.timeSlots) {
+          if (this.isTimeSlotExpired(timeSlot)) {
+            await this.removeTimeSlotRelationships(timeSlot);
   
-              const newTimeSlot: any = {
-                day: timeSlot.day,
-                startTime: timeSlot.startTime,
-                endTime: timeSlot.endTime,
-                stadium: { id: stadium.id },
-              };
+            const newGameHistory = await this.createGameHistory(timeSlot, stadium);
   
-              await this.timeSlotRepositroy.save(newTimeSlot);
-            }
+            await this.updateUsersWithGameHistory(timeSlot, newGameHistory);
+  
+            await this.createOrUpdateNewTimeSlot(timeSlot, stadium);
           }
         }
-
-
+      }
     } catch (error) {
-      Error(error);
+      console.error("Error in updateTimeSlotStadiums:", error);
     }
   }
+  
+  async getAllStadiumsWithTimeSlots() {
+    return await this.stadiumRepository
+      .createQueryBuilder("stadium")
+      .leftJoinAndSelect("stadium.field", "field")
+      .leftJoinAndSelect("stadium.timeSlots", "timeSlot")
+      .leftJoinAndSelect("timeSlot.team", "user")
+      .getMany();
+  }
+  
+  isTimeSlotExpired(timeSlot: TimeSlot): boolean {
+    const timeOfEndingGame = new Date(timeSlot.endTime);
+    const currentTime = new Date();
+    timeOfEndingGame.setHours(0, 0, 0, 0);
+    currentTime.setHours(0, 0, 0, 0);
+  
+    return currentTime > timeOfEndingGame;
+  }
+  
+  async removeTimeSlotRelationships(timeSlot: TimeSlot) {
+    for (const user of timeSlot.team) {
+      await this.userRepositroy
+        .createQueryBuilder()
+        .relation(User, "timeSlots")
+        .of(user)
+        .remove(timeSlot);
+    }
+  }
+  
+  async createGameHistory(timeSlot: TimeSlot, stadium: Stadium): Promise<GameHistory> {
+    const newGameHistory = new GameHistory();
+    newGameHistory.day = timeSlot.day;
+    newGameHistory.startTime = timeSlot.startTime;
+    newGameHistory.endTime = timeSlot.endTime;
+    newGameHistory.stadium = stadium;
+  
+    try {
+      return await this.gameHistoryRepositroy.save(newGameHistory);
+    } catch (error) {
+      console.error("Error saving newGameHistory:", error);
+      throw error;
+    }
+  }
+  
+  async updateUsersWithGameHistory(timeSlot: TimeSlot, newGameHistory: GameHistory) {
+    for (const user of timeSlot.team) {
+      const updateUser = await this.userRepositroy.findOne({
+        where: { id: user.id },
+        relations: ["timeSlots", "gameHistories"],
+      });
+  
+      if (updateUser) {
+        updateUser.gameHistories.push(newGameHistory);
+  
+        try {
+          await this.userRepositroy.save(updateUser);
+          console.log("User updated with newGameHistory:", updateUser);
+        } catch (error) {
+          console.error("Error saving updateUser:", error);
+          throw error;
+        }
+      } else {
+        console.error("User not found for id:", user.id);
+      }
+    }
+  }
+  
+  async createOrUpdateNewTimeSlot(timeSlot: TimeSlot, stadium: Stadium) {
+    timeSlot.startTime.setDate(timeSlot.startTime.getDate() + 7);
+    timeSlot.endTime.setDate(timeSlot.endTime.getDate() + 7);
+  
+    const existingTimeSlot = await this.timeSlotRepositroy.findOneBy({id:timeSlot.id});
+  
+    if (existingTimeSlot) {
+      await this.timeSlotRepositroy.remove(existingTimeSlot);
+    }
+  
+    const newTimeSlot: any = {
+      day: timeSlot.day,
+      startTime: timeSlot.startTime,
+      endTime: timeSlot.endTime,
+      stadium: { id: stadium.id },
+    };
+  
+    await this.timeSlotRepositroy.save(newTimeSlot);
+  }
+  
+  // async updateTimeSlotStadiums() {
+  //   try {
+  //     const allStadiums = await this.stadiumRepository
+  //       .createQueryBuilder("stadium")
+  //       .leftJoinAndSelect("stadium.field", "field")
+  //       .leftJoinAndSelect("stadium.timeSlots", "timeSlot")
+  //       .leftJoinAndSelect("timeSlot.team", "user")
+  //       .getMany();
+  
+  //     for (const stadium of allStadiums) {
+  //       for (const timeSlot of stadium.timeSlots) {
+  //         const timeOfEndingGame = new Date(timeSlot.endTime);
+  //         const currentTime = new Date();
+  //         timeOfEndingGame.setHours(0, 0, 0, 0);
+  //         currentTime.setHours(0, 0, 0, 0);  
+  //         if (currentTime > timeOfEndingGame) {
+  
+  //           for (const user of timeSlot.team) {
+  //             // Remove the relationship between TimeSlot and User
+  //             await this.userRepositroy
+  //               .createQueryBuilder()
+  //               .relation(User, "timeSlots")
+  //               .of(user)
+  //               .remove(timeSlot);
+  //           } 
+
+  //           const newGameHistory = new GameHistory();
+  //           newGameHistory.day = timeSlot.day;
+  //           newGameHistory.startTime = timeSlot.startTime;
+  //           newGameHistory.endTime = timeSlot.endTime;
+  //           newGameHistory.stadium = stadium;
+  
+  //           for (const user of timeSlot.team) {
+  //             const updateUser = await this.userRepositroy.findOne({
+  //               where: { id: user.id },
+  //               relations: ["timeSlots", "gameHistories"],
+  //             });
+  
+  //             if (updateUser) {
+  //               updateUser.gameHistories.push(newGameHistory);
+  
+  //               try {
+  //                 await this.userRepositroy.save(updateUser);
+  //                 console.log("User updated with newGameHistory:", updateUser);
+  //               } catch (error) {
+  //                 console.error("Error saving updateUser:", error);
+  //               }
+  //             } else {
+  //               console.error("User not found for id:", user.id);
+  //             }
+  //           }
+
+  
+  //           try {
+  //             this.gameHistoryRepositroy.save(newGameHistory).then(async()=>{
+  //               console.log("created in gamehistory table");
+                
+  //             timeSlot.startTime.setDate(timeSlot.startTime.getDate() + 7);
+  //             timeSlot.endTime.setDate(timeSlot.endTime.getDate() + 7);
+  //             let TimeSlotRecreate = await this.timeSlotRepositroy.findOneBy({
+  //               id: timeSlot.id,
+  //             });
+  //             await this.timeSlotRepositroy.remove(TimeSlotRecreate);
+
+  //             const newTimeSlot: any = {
+  //               day: timeSlot.day,
+  //               startTime: timeSlot.startTime,
+  //               endTime: timeSlot.endTime,
+  //               stadium: { id: stadium.id },
+  //             };
+
+  //             await this.timeSlotRepositroy.save(newTimeSlot);
+  //           })             
+  //           } catch (error) {
+  //             console.error("Error saving newGameHistory:", error);
+  //           }
+  
+  //           // Additional logic if needed
+  //         }
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.error("Error in updateTimeSlotStadiums:", error);
+  //   }
+  // }
+  
   async getOneStadium(
     request: Request,
     response: Response,
@@ -81,6 +309,7 @@ export class StadiumController {
         .createQueryBuilder("stadium")
         .leftJoinAndSelect("stadium.field", "field")
         .leftJoinAndSelect("stadium.timeSlots", "timeSlot")
+        .leftJoinAndSelect("stadium.stadiumImages", "imageStadium")
         .leftJoinAndSelect("timeSlot.team", "user")
         .where("stadium.id = :id", { id })
         .getOne();
@@ -91,8 +320,7 @@ export class StadiumController {
           message: "Cet stadium n'existe pas !",
         });
       } else {
-
-        response.send({ data: oneStadium});
+        response.send({ data: oneStadium });
       }
     } catch (error) {
       console.error(error);
@@ -161,7 +389,84 @@ export class StadiumController {
     }
   }
 
+  async updateStadium(
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ) {
+    try {
+      
+      const id = parseInt(request.params.id);
+      const {
+        stadiumName,
+        fieldId,
+        capacity,
+        price,
+        numberOfCourts,
+        numberOfHoops,
+        imageURL,
+        longitude,
+        latitude,
+        status,
+        Region,
+        isFree,
+        isInDoor,
+        hasLighting,
+        hasShower,
+      } = request.body;
+  
+      let stadiumToUpdate = await this.stadiumRepository
+      .createQueryBuilder("stadium")
+      .where("user.id = :id", { id })
+      .getOne();
+  
+      if (!stadiumToUpdate) {
+        return response.status(400).json({
+          error: "User does not exist!!",
+        });
+      } else {
+        stadiumToUpdate.stadiumName = stadiumName;
+        stadiumToUpdate.capacity = capacity;
+        stadiumToUpdate.price = price;
+        stadiumToUpdate.longitude = longitude;
+        stadiumToUpdate.latitude = latitude;
+        stadiumToUpdate.status = status;
+        stadiumToUpdate.isFree = isFree;
+        stadiumToUpdate.isInDoor = isInDoor;
+        stadiumToUpdate.hasLighting = hasLighting;
+        stadiumToUpdate.hasShower = hasShower;
+        stadiumToUpdate.Region = Region;
+        stadiumToUpdate.numberOfCourts = numberOfCourts;
+        stadiumToUpdate.numberOfHoops = numberOfHoops;
+  
+        await this.stadiumRepository.save(stadiumToUpdate);
+  
+        response.send({ data: stadiumToUpdate });
+      }
+    } catch (error) {
+      console.error(error);
+      response.status(500).send(error);
+    }
+  }
 
+  async deleteStadium(
+		request: Request,
+		response: Response,
+		next: NextFunction
+	) {
+		const id = parseInt(request.params.id);
+
+		let stadiumToRemove = await this.stadiumRepository.findOneBy({ id });
+
+		if (!stadiumToRemove) {
+			response.send({
+				success: false,
+				message: "stadium not found.",
+			});
+		} else {
+			return this.stadiumRepository.remove(stadiumToRemove);
+		}
+	}
 }
 
 export default new StadiumController();

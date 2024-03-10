@@ -11,6 +11,8 @@ import {
 
 import { TimeSlot } from "./TimeSlot";
 import { Field } from "./Field";
+import { GameHistory } from "./GameHistory";
+import { ImageStadium } from "./ImageStadium";
 
 @Entity()
 export class Stadium {
@@ -90,7 +92,13 @@ export class Stadium {
   @OneToMany(() => TimeSlot, (timeSlot) => timeSlot.stadium)
   timeSlots: TimeSlot[];
 
+  @OneToMany(() => GameHistory, (gameHistory) => gameHistory.stadium)
+  gameHistories: GameHistory[];
+
   @ManyToOne(() => Field, (field) => field.stadiums)
   @JoinTable()
   field: Field;
+
+  @OneToMany(() => ImageStadium, (image) => image.stadium)
+	stadiumImages: ImageStadium[];
 }

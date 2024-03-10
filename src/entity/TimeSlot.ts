@@ -12,7 +12,7 @@ import {
 } from "typeorm";
 import { User } from "./User";
 import { Stadium } from "./Stadium";
-
+import { GameHistory } from "./GameHistory";
 @Entity()
 export class TimeSlot {
   @PrimaryGeneratedColumn()
@@ -33,11 +33,13 @@ export class TimeSlot {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @ManyToMany(() => User, (user) => user.timeSlots)
-  @JoinTable()
-  team : User[];
+@ManyToMany(() => User, (user) => user.timeSlots, { cascade: ['remove'] })
+@JoinTable()
+  team: User[];
 
   @ManyToOne(() => Stadium, (stadium) => stadium.timeSlots)
   @JoinTable()
   stadium: Stadium;
+
+  
 }

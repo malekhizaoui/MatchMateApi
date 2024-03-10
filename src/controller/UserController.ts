@@ -7,13 +7,14 @@ export class UserController {
   private timeSlotRepository = AppDataSource.getRepository(TimeSlot);
 
   async getAllUsers(request: Request, response: Response, next: NextFunction) {
-    
     try {
-      console.log("dddd");
 
       const allUsers = await this.userRepository
         .createQueryBuilder("user")
         .leftJoinAndSelect("user.timeSlots", "timeSlot")
+        .leftJoinAndSelect("user.gameHistories", "gameHistory")
+        // .leftJoinAndSelect("gameHistories.stadium", "stadium")
+        // .leftJoinAndSelect("gameHistories.team", "user")
         .getMany();
 
       response.send({
@@ -34,7 +35,8 @@ export class UserController {
         .createQueryBuilder("user")
         .leftJoinAndSelect("user.timeSlots", "timeSlot")
         .leftJoinAndSelect("timeSlot.stadium", "stadium")
-        .leftJoinAndSelect("timeSlot.team", "team")
+        .leftJoinAndSelect("user.gameHistories", "gameHistory")
+    
         .where("user.id = :id", { id })
         .getOne();
 
@@ -52,7 +54,7 @@ export class UserController {
     }
   }
 
-  async updateUserByID(
+  async updateUser(
     request: Request,
     response: Response,
     next: NextFunction
@@ -79,7 +81,7 @@ export class UserController {
       .createQueryBuilder("user")
       .leftJoinAndSelect("user.timeSlots", "timeSlot")
       .where("user.id = :id", { id })
-      .getOne();;
+      .getOne();
   
       if (!userToUpdate) {
         return response.status(400).json({
@@ -130,25 +132,24 @@ export class UserController {
   }
   
   
-  
+  async deleteUser(
+		request: Request,
+		response: Response,
+		next: NextFunction
+	) {
+		const id = parseInt(request.params.id);
 
-  async addUserToTimeSlot(request: Request, response: Response, next: NextFunction) {
-    try {
-      const {
-        userId,
-      } = request.params;
-      // Find the user and team by their IDs
-      const user = await this.userRepository.findOne({ where: { id: Number(userId) } });
-     
-      response.send({
-          success: false,
-          data: user,
-        })
-    } catch (error) {
-      console.error("Error adding user to team:", error);
-      return null;
-    }
-  }
+		let userToRemove = await this.userRepository.findOneBy({ id });
+
+		if (!userToRemove) {
+			response.send({
+				success: false,
+				message: "user not found.",
+			});
+		} else {
+			return this.userRepository.remove(userToRemove);
+		}
+	}
 
 
 }

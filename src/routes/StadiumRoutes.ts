@@ -22,24 +22,15 @@ export const stadiumdRoutes = [
 		includeVerifyToken: false,
 		includeVerifyAdmin:false
 	},
-	// {
-	// 	method: 'put',
-	// 	route: '/users/:id',
-	// 	controller: UserController,
-	// 	action: 'updateUserByID',
-	// 	validation: [param('id').isInt()],
-	// 	includeVerifyToken: false,
-	// 	includeVerifyAdmin:false
-	// },
-	// {
-	// 	method: 'put',
-	// 	route: '/newVisited/:id',
-	// 	controller: UserController,
-	// 	action: 'monumentVisitedByUser',
-	// 	validation: [param('id').isInt()],
-	// 	includeVerifyToken: false,
-	// 	includeVerifyAdmin:false
-	// },
+	{
+		method: 'put',
+		route: '/stadium/:id',
+		controller: StadiumController,
+		action: 'updateStadium',
+		validation: [param('id').isInt()],
+		includeVerifyToken: false,
+		includeVerifyAdmin:false
+	},
 	{
 		method: 'post',
 		route: '/stadium',
@@ -49,14 +40,14 @@ export const stadiumdRoutes = [
 		includeVerifyToken: false,
 		includeVerifyAdmin:false
 	},
-	// {
-	// 	method: 'delete',
-	// 	route: '/feedback/remove/:id',
-	// 	controller: UserController,
-	// 	action: 'deleteFeedback',
-	// 	validation: [param('id').isInt()],
-	// 	includeVerifyToken: false,
-	// 	includeVerifyAdmin:false
+	{
+		method: 'delete',
+		route: '/stadium/remove/:id',
+		controller: StadiumController,
+		action: 'deleteStadium',
+		validation: [param('id').isInt()],
+		includeVerifyToken: false,
+		includeVerifyAdmin:false
 
-	// },
+	},
 ];

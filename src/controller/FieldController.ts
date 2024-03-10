@@ -80,4 +80,59 @@ async createField(
         response.status(500).send(error);
     }
 }
+
+async updateField(
+  request: Request,
+  response: Response,
+  next: NextFunction
+) {
+  try {
+    
+    const id = parseInt(request.params.id);
+    const {
+      fieldName
+    } = request.body;
+
+    let fieldToUpdate = await this.fieldRepository
+    .createQueryBuilder("stadium")
+    .where("user.id = :id", { id })
+    .getOne();
+
+    if (!fieldToUpdate) {
+      return response.status(400).json({
+        error: "User does not exist!!",
+      });
+    } else {
+      fieldToUpdate.fieldName = fieldName;
+     ;
+
+      await this.fieldRepository.save(fieldToUpdate);
+
+      response.send({ data: fieldToUpdate });
+    }
+  } catch (error) {
+    console.error(error);
+    response.status(500).send(error);
+  }
+}
+
+async deleteField(
+  request: Request,
+  response: Response,
+  next: NextFunction
+) {
+  const id = parseInt(request.params.id);
+
+  let fieldToRemove = await this.fieldRepository.findOneBy({ id });
+
+  if (!fieldToRemove) {
+    response.send({
+      success: false,
+      message: "field not found.",
+    });
+  } else {
+    return this.fieldRepository.remove(fieldToRemove);
+  }
+}
+
 }

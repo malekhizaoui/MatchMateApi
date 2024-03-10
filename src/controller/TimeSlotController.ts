@@ -13,40 +13,43 @@ export class TimeSlotsController {
     response: Response,
     next: NextFunction
   ) {
-    try {
+    try {  
       const allTimeSlots = await this.timeSlotRepository
         .createQueryBuilder("timeSlots")
         .leftJoinAndSelect("timeSlots.team", "user")
         .leftJoinAndSelect("timeSlots.stadium", "stadium")
         .getMany();
 
+  
       response.send({
         count: allTimeSlots.length,
         data: allTimeSlots,
       });
     } catch (error) {
-      Error(error);
+      console.error(error);
       response.status(500).send(error);
     }
   }
+  
 
-  async getOneUser(request: Request, response: Response, next: NextFunction) {
+  async getOneTimeSlot(request: Request, response: Response, next: NextFunction) {
     try {
       const id = parseInt(request.params.id);
 
-      const oneUser = await this.userRepository
-        .createQueryBuilder("user")
-        .leftJoinAndSelect("user.teams", "team")
-        .where("user.id = :id", { id })
+      const oneTimSlot = await this.timeSlotRepository
+        .createQueryBuilder("timeSlot")
+        .leftJoinAndSelect("timeSlot.team", "user")
+        .leftJoinAndSelect("timeSlot.stadium", "stadium")
+        .where("timeSlot.id = :id", { id })
         .getOne();
 
-      if (!oneUser) {
+      if (!oneTimSlot) {
         response.send({
           success: false,
-          message: "Cet utilisateur n'existe pas !",
+          message: "timeSlot not found !",
         });
       } else {
-        response.send({ data: oneUser });
+        response.send({ data: oneTimSlot });
       }
     } catch (error) {
       console.error(error);
@@ -54,45 +57,31 @@ export class TimeSlotsController {
     }
   }
 
-  async updateUserByID(
+  async updateTimeSlot (
     request: Request,
     response: Response,
     next: NextFunction
   ) {
     try {
       const id = parseInt(request.params.id);
-      const {
-        lastName,
-        firstName,
-        email,
-        code_verification,
-        is_verified,
-        password,
-        age,
-        hobbies,
-        image,
-        region,
-      } = request.body;
+      const {stadiumId, day, startTime, endTime } = request.body;
 
-      let userToUpdate = await this.userRepository.findOneBy({ id });
 
-      if (!userToUpdate) {
+      let timeSlotToUpdate = await this.timeSlotRepository.findOneBy({ id });
+      let stadiumToUpdate = await this.stadiumRepository.findOneBy({ id:stadiumId });
+
+      if (!timeSlotToUpdate || !stadiumToUpdate) {
         return response.status(400).json({
-          error: "user n'existe pas!!",
+          error: "user or stadium not found!!",
         });
       } else {
-        userToUpdate.lastName = lastName;
-        userToUpdate.firstName = firstName;
-        userToUpdate.email = email;
-        userToUpdate.code_verification = code_verification;
-        userToUpdate.is_verified = is_verified;
-        userToUpdate.password = password;
-        userToUpdate.age = age;
-        userToUpdate.hobbies = hobbies;
-        userToUpdate.image = image;
-        userToUpdate.region = region;
+        timeSlotToUpdate.stadium = stadiumToUpdate;
+        timeSlotToUpdate.day = day;
+        timeSlotToUpdate.startTime = startTime;
+        timeSlotToUpdate.endTime = endTime;
+       
 
-        return this.userRepository.save(userToUpdate);
+        return this.timeSlotRepository.save(timeSlotToUpdate);
       }
     } catch (error) {
       Error(error);
@@ -131,4 +120,25 @@ export class TimeSlotsController {
       response.status(500).send(error);
     }
   }
+
+
+  async deleteTimeSlot(
+		request: Request,
+		response: Response,
+		next: NextFunction
+	) {
+		const id = parseInt(request.params.id);
+
+		let timeSlotToRemove = await this.timeSlotRepository.findOneBy({ id });
+
+		if (!timeSlotToRemove) {
+			response.send({
+				success: false,
+				message: "timeSlot not found.",
+			});
+		} else {
+			return this.timeSlotRepository.remove(timeSlotToRemove);
+		}
+	}
+
 }

@@ -8,7 +8,6 @@ import {
   } from "typeorm";
   
 import { Stadium } from "./Stadium";
-
   @Entity()
   export class Field {
     @PrimaryGeneratedColumn()
@@ -28,6 +27,5 @@ import { Stadium } from "./Stadium";
 
     @OneToMany(() => Stadium, (stadium) => stadium.field)
 	  stadiums: Stadium[];
-
   }
   

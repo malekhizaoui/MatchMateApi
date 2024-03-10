@@ -1,12 +1,12 @@
 import { param, body } from 'express-validator';
-import { TimeSlotsController } from '../controller/TimeSlotController'; 
+import { GameHistoryController } from '../controller/GameHistory'; 
 
-export const timeSlotRoutes = [
+export const gameHistoryRoutes = [
 	{
 		method: 'get',
-		route: '/timeSlots',
-		controller: TimeSlotsController,
-		action: 'getAllTimeSlots',
+		route: '/gameHistories',
+		controller: GameHistoryController,
+		action: 'getAllGameHistories',
 		validation: [],
 		includeVerifyToken: false,
 		includeVerifyAdmin:false
@@ -14,38 +14,39 @@ export const timeSlotRoutes = [
 	},
 	{
 		method: 'get',
-		route: '/timeSlot/:id',
-		controller: TimeSlotsController,
-		action: 'getOneTimeSlot',
+		route: '/field/:id',
+		controller: GameHistoryController,
+		action: 'getOneField',
 		validation: [param('id').isInt()],
 		includeVerifyToken: false,
 		includeVerifyAdmin:false
 	},
 	{
 		method: 'put',
-		route: '/timeSlot/:id',
-		controller: TimeSlotsController,
-		action: 'updateTimeSlot',
+		route: '/field/:id',
+		controller: GameHistoryController,
+		action: 'updateField',
 		validation: [param('id').isInt()],
 		includeVerifyToken: false,
 		includeVerifyAdmin:false
 	},
 	{
 		method: 'post',
-		route: '/timeSlot',
-		controller: TimeSlotsController,
-		action: 'createTimeSlot',
+		route: '/field',
+		controller: GameHistoryController,
+		action: 'createField',
 		validation: [],
 		includeVerifyToken: false,
 		includeVerifyAdmin:false
 	},
 	{
 		method: 'delete',
-		route: '/timeSlot/remove/:id',
-		controller: TimeSlotsController,
-		action: 'deleteTimeSlot',
+		route: '/field/remove/:id',
+		controller: GameHistoryController,
+		action: 'deleteFeedback',
 		validation: [param('id').isInt()],
 		includeVerifyToken: false,
 		includeVerifyAdmin:false
+
 	},
 ];
