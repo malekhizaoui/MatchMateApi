@@ -8,7 +8,7 @@ import {
   JoinTable,
   OneToOne,
   OneToMany,
-  ManyToMany
+  ManyToMany,
 } from "typeorm";
 import { User } from "./User";
 import { Stadium } from "./Stadium";
@@ -19,7 +19,7 @@ export class TimeSlot {
   id: number;
 
   @Column()
-  day: string; 
+  day: string;
 
   @Column()
   startTime: Date;
@@ -33,13 +33,11 @@ export class TimeSlot {
   @UpdateDateColumn()
   updated_at: Date;
 
-@ManyToMany(() => User, (user) => user.timeSlots, { cascade: ['remove'] })
-@JoinTable()
+  @ManyToMany(() => User, (user) => user.timeSlots, { cascade: ["remove"] })
+  @JoinTable()
   team: User[];
 
   @ManyToOne(() => Stadium, (stadium) => stadium.timeSlots)
   @JoinTable()
   stadium: Stadium;
-
-  
 }

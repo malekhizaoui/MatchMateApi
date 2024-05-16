@@ -1,7 +1,10 @@
+import { config } from 'dotenv';
+config();
 import { AppDataSource } from "./data-source";
 import * as express from "express";
 import { configureRoutes } from './routesConfig';
 import * as schedule from 'node-schedule';
+import cors = require("cors");
 
 import stadiumController from "./controller/StadiumController";
 
@@ -18,11 +21,8 @@ async function runScheduledTask() {
 AppDataSource.initialize()
   .then(async () => {
     const app = express();
+    app.use(cors());
     app.use(express.json());
-    
-
-   
-
 
     configureRoutes(app);
     
@@ -32,7 +32,7 @@ AppDataSource.initialize()
       console.log(`Server is running on port ${port}`);
     });
 
-    const job = schedule.scheduleJob('33 13 * * *', runScheduledTask);
+    const job = schedule.scheduleJob('12 12 * * *', runScheduledTask);
 
   })
   .catch((error) => {

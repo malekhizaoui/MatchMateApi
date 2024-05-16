@@ -22,6 +22,28 @@ export class GameHistoryController {
     }
   }
 
+  async getAllGameHistoriesbyUserId(request: Request, response: Response, next: NextFunction) {
+    try {
+      const userId = parseInt(request.params.id);
+
+      const allGameHistories = await this.gameHistoryRepository
+      .createQueryBuilder("gameHistory")
+      .leftJoinAndSelect("gameHistory.team", "user")
+      .leftJoinAndSelect("gameHistory.stadium", "stadium")
+      .where("user.id = :userId", { userId })
+      .getMany();
+
+      response.send({
+        count: allGameHistories.length,
+        data: allGameHistories,
+      });
+    } catch (error) {
+      Error(error);
+      response.status(500).send(error);
+    }
+  }
+
+
 //   async getOneField(request: Request, response: Response, next: NextFunction) {
 //     try {
 //       const id = parseInt(request.params.id);

@@ -22,6 +22,15 @@ export const gameHistoryRoutes = [
 		includeVerifyAdmin:false
 	},
 	{
+		method: 'get',
+		route: '/gameHistoryUserId/:id',
+		controller: GameHistoryController,
+		action: 'getAllGameHistoriesbyUserId',
+		validation: [param('id').isInt()],
+		includeVerifyToken: false,
+		includeVerifyAdmin:false
+	},
+	{
 		method: 'put',
 		route: '/field/:id',
 		controller: GameHistoryController,

@@ -9,6 +9,7 @@ export class AuthController {
   private userRepository = AppDataSource.getRepository(User);
                           
   async register(req: Request, res: Response, next: NextFunction) {
+    
     try {
       const { firstName, lastName, email, age, password } = req.body;
       // Check if the email is already registered
@@ -38,11 +39,13 @@ export class AuthController {
       console.error('Error during user registration:', error);
       return res.status(500).json({ message: 'Internal Server Error' });
     }
-  }
+}
+
 
   
 
   async connexion(request: Request, response: Response, next: NextFunction) {
+	
 		try {
 			const { password } = request.body;
 			const email = request.body.email
@@ -84,7 +87,9 @@ export class AuthController {
 		} catch (error) {
 			Error(error);
 			response.status(500).send(error);
+			console.log("error",error);
+			
 		}
 	}
-  
+
 }

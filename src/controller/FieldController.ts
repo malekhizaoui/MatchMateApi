@@ -1,6 +1,7 @@
 import { AppDataSource } from "../data-source";
 import { NextFunction, Request, Response } from "express";
 import { Field } from "../entity/Field";
+import { getConnection } from "typeorm";
 
 export class FieldController {
   private fieldRepository = AppDataSource.getRepository(Field);
@@ -134,5 +135,37 @@ async deleteField(
     return this.fieldRepository.remove(fieldToRemove);
   }
 }
+
+async getFieldsByStadiumRegionFromBody(
+  request: Request,
+  response: Response,
+  next: NextFunction
+) {
+  try {
+    const { region } = request.params;
+
+    // Query the fields along with their stadiums based on the specified region
+    const fieldsWithStadiums = await this.fieldRepository
+      .createQueryBuilder("field")
+      .innerJoinAndSelect("field.stadiums", "stadium", "stadium.Region = :region", { region })
+      .orderBy("field.created_at", "ASC") // Order by created_at field in ascending order
+      .getMany();
+
+    // Return the fields with their stadiums for the specified region
+    response.send(fieldsWithStadiums);
+  } catch (error) {
+    console.error(error);
+    response.status(500).send(error); // Send error response if any
+  }
+}
+
+
+
+
+
+
+
+
+
 
 }
