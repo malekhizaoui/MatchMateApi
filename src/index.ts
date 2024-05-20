@@ -4,7 +4,7 @@ import { AppDataSource } from "./data-source";
 import * as express from "express";
 import { configureRoutes } from './routesConfig';
 import * as schedule from 'node-schedule';
-import cors = require("cors");
+import * as cors from 'cors';
 
 import stadiumController from "./controller/StadiumController";
 
@@ -32,7 +32,7 @@ AppDataSource.initialize()
       console.log(`Server is running on port ${port}`);
     });
 
-    const job = schedule.scheduleJob('12 12 * * *', runScheduledTask);
+    const job = schedule.scheduleJob('08 12 * * *', runScheduledTask);
 
   })
   .catch((error) => {
