@@ -1,10 +1,11 @@
 const { config } = require('dotenv');
 config();
-import { AppDataSource } from "./data-source";
-import * as express from "express";
-import { configureRoutes } from './routesConfig';
-import * as schedule from 'node-schedule';
-import * as cors from 'cors';
+const { AppDataSource } = require("./data-source");
+const express = require("express");
+const { configureRoutes } = require('./routesConfig');
+const schedule = require('node-schedule');
+const cors = require('cors');
+
 
 import stadiumController from "./controller/StadiumController";
 
