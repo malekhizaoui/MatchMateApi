@@ -8,7 +8,7 @@ import { GameHistory } from "./entity/GameHistory"
 import { ImageStadium } from "./entity/ImageStadium"
 export const AppDataSource = new DataSource({
     type: "postgres",
-    host: "localhost",
+    host: "16.171.175.193",
     port: 5432,
     username: "postgres",
     password: "jesuiskiller",
