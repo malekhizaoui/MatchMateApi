@@ -9,8 +9,7 @@ import * as cors from 'cors';
 import stadiumController from "./controller/StadiumController";
 
 async function runScheduledTask() {
-  console.log("skn");
-  
+  console.log("eeeee");
   try {    
     await stadiumController.updateTimeSlotStadiums();
   } catch (error) {
@@ -32,7 +31,7 @@ AppDataSource.initialize()
       console.log(`Server is running on port ${port}`);
     });
 
-    const job = schedule.scheduleJob('08 12 * * *', runScheduledTask);
+    const job = schedule.scheduleJob('32 11 * * *', runScheduledTask);
 
   })
   .catch((error) => {

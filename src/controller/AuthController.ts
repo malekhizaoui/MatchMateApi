@@ -11,6 +11,8 @@ export class AuthController {
 
   
   async register(req: Request, res: Response, next: NextFunction) {
+    console.log("dddddd");
+    
     try {
       const { firstName, lastName, email, age, password } = req.body;
       // Check if the email is already registered
@@ -76,7 +78,7 @@ export class AuthController {
 
       const token = jwt.sign({ id: findUser.id }, process.env.TOKEN_SECRET);
 
-      return response.header("auth-token", token).json({ findUser, token });
+      return response.json({ findUser, token });
     } catch (error) {
       console.error("Error during user connexion:", error);
       return response.status(500).json({ message: "Internal Server Error" });
