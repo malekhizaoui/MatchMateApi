@@ -30,13 +30,12 @@
       "pg": "^8.4.0",
       "reflect-metadata": "^0.1.13",
       "rsync": "^0.6.1",
-      "typeorm": "0.3.20",
+      "typeorm": "^0.3.20",
       "uuid": "^9.0.1"
    },
    "scripts": {
       "start": "ts-node src/index.ts",
       "dev": "nodemon --exec ts-node src/index.ts",
-      "typeorm": "typeorm-ts-node-commonjs",
-      "sync": "rsync -avz --exclude 'node_modules' --exclude '.git' --exclude '.env' -e 'ssh -i ~/.ssh/matchmate-msi.pem' . ubuntu@ec2-16-171-175-193.eu-north-1.compute.amazonaws.com:~/app"
+      "typeorm": "typeorm-ts-node-commonjs"
    }
 }

@@ -31,7 +31,7 @@ AppDataSource.initialize()
       console.log(`Server is running on port ${port}`);
     });
 
-    const job = schedule.scheduleJob('32 11 * * *', runScheduledTask);
+    const job = schedule.scheduleJob('19 22 * * *', runScheduledTask);
 
   })
   .catch((error) => {
