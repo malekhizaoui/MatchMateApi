@@ -40,6 +40,7 @@ export class TimeSlotsController {
         .createQueryBuilder("timeSlot")
         .leftJoinAndSelect("timeSlot.team", "user")
         .leftJoinAndSelect("timeSlot.stadium", "stadium")
+        .leftJoinAndSelect("stadium.field", "field")
         .where("timeSlot.id = :id", { id })
         .getOne();
 

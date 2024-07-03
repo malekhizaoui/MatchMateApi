@@ -3,12 +3,12 @@ import emailjs from '@emailjs/nodejs';
 export async function sendVerificationCode(email: string, code: number, firstName: string) {
     try {
       const templateParams = {
-        from_name: 'Dourbia Team',
+        from_name: 'MatchMate Team',
         to_name: `${firstName}`,
         destinataire: `${email}`,
-        message: "Veuillez retourner à l'application Dourbia pour introduire le code suivant :",
+        message: "Veuillez retourner à l'application MatchMate pour introduire le code suivant :",
         code: `${code}`,
-        message2: 'Ce code est valable 10 minutes.',
+        message2: '',
       };
   
       const response = await emailjs.send('service_g5umsa8', 'template_ljhp0cq', templateParams, {

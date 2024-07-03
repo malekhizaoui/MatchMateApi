@@ -3,16 +3,19 @@ import { NextFunction, Request, Response } from "express";
 import { User } from "../entity/User";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
+import { OAuth2Client } from 'google-auth-library';
 
 import { sendVerificationCode } from "../services/emailService";
 export class AuthController {
   private userRepository = AppDataSource.getRepository(User);
-
+   client = new OAuth2Client(
+    '597756036187-100uttcrtbm9mknefminun9350h5shd4.apps.googleusercontent.com'
+  );
+   CLIENT_ID =
+    '597756036187-100uttcrtbm9mknefminun9350h5shd4.apps.googleusercontent.com';
 
   
-  async register(req: Request, res: Response, next: NextFunction) {
-    console.log("dddddd");
-    
+  async register(req: Request, res: Response, next: NextFunction) {    
     try {
       const { firstName, lastName, email, age, password } = req.body;
       // Check if the email is already registered
@@ -30,6 +33,7 @@ export class AuthController {
         password,
         age,
         code_verification: verificationCode,
+        image:"https://cdn.vectorstock.com/i/1000v/82/55/anonymous-user-circle-icon-vector-18958255.jpg"
       });
       const salt = await bcrypt.genSalt(10);
       newUser.password = await bcrypt.hash(newUser.password, salt);
@@ -84,4 +88,52 @@ export class AuthController {
       return response.status(500).json({ message: "Internal Server Error" });
     }
   }
+
+  async loginGoogle(request: Request, response: Response, next: NextFunction) {
+		const { tokenId } = request.body;
+		try {
+			const user = await this.client.verifyIdToken({
+				idToken: tokenId,
+				audience:
+					'597756036187-100uttcrtbm9mknefminun9350h5shd4.apps.googleusercontent.com',
+			});
+			const { email_verified, email, family_name, given_name, picture } =
+				user.getPayload();
+			let findUser = await this.userRepository.findOneBy({
+				email,
+			});
+			// if (findUser) {
+			// 	const token = jwt.sign({ _id: findUser.id }, process.env.TOKEN_SECRET);
+			// 	response
+			// 		.status(200)
+			// 		.header('auth-token', token)
+			// 		.send({ token, userId: findUser.id.toString() });
+			// } else {
+			// 	let password = Date.now().toString();
+			// 	const findUser = Object.assign(new User(), {
+			// 		email_utilisateur: email,
+			// 		nom_utilisateur: given_name,
+			// 		prenom_utilisateur: family_name,
+			// 		password_utilisateur: password,
+			// 		photo_utilisateur: picture,
+			// 		is_verified: true,
+			// 	});
+			// 	const salt = await bcrypt.genSalt(10);
+			// 	findUser.password_utilisateur = await bcrypt.hash(
+			// 		findUser.password_utilisateur,
+			// 		salt
+			// 	);
+			// 	const token = jwt.sign({ _id: findUser.id }, process.env.TOKEN_SECRET);
+			// 	// response.header('auth-token', token).send({ findUser, token });
+			// 	await this.userRepository.save(findUser);
+			// 	response
+			// 		.status(200)
+			// 		.header('auth-token', token)
+			// 		.send({ token, userId: findUser.id.toString() });
+			// }
+		} catch (err) {
+			Error(err);
+			response.status(500).send(err);
+		}
+	}
 }

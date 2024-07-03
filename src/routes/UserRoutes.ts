@@ -41,4 +41,17 @@ export const userRoutes = [
 		includeVerifyAdmin:false
 
 	},
+	{
+		method: 'delete',
+		route: '/users/:userId/timeSlots/:timeSlotId',
+		controller: UserController,
+		action: 'deleteTimeSlotFromUser',
+		validation: [
+		  param('userId').isInt().withMessage('User ID must be an integer'),
+		  param('timeSlotId').isInt().withMessage('TimeSlot ID must be an integer')
+		],
+		includeVerifyToken: false,
+		includeVerifyAdmin: false
+	  }
+	  
 ];
