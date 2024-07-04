@@ -13,6 +13,7 @@ import { TimeSlot } from "./TimeSlot";
 import { Field } from "./Field";
 import { GameHistory } from "./GameHistory";
 import { ImageStadium } from "./ImageStadium";
+import { Feedback } from "./Feedback";
 
 @Entity()
 export class Stadium {
@@ -101,4 +102,7 @@ export class Stadium {
 
   @OneToMany(() => ImageStadium, (image) => image.stadium)
 	stadiumImages: ImageStadium[];
+
+  @OneToMany(() => Feedback, (feedback) => feedback.stadium)
+  feedbacks: Feedback[];
 }

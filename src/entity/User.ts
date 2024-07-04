@@ -11,6 +11,8 @@ import {
 } from "typeorm";
 import { GameHistory } from "./GameHistory";
 import { TimeSlot } from "./TimeSlot";
+import { Feedback } from "./Feedback";
+
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
@@ -68,10 +70,15 @@ export class User {
   @JoinTable()
   timeSlots: TimeSlot[];
 
- // User entity
-@ManyToMany(type => GameHistory, gameHistory => gameHistory.team, { cascade: ['insert', 'update'] })
-@JoinTable()
-gameHistories: GameHistory[];
+  // User entity
+  @ManyToMany((type) => GameHistory, (gameHistory) => gameHistory.team, {
+    cascade: ["insert", "update"],
+  })
+  @JoinTable()
+  gameHistories: GameHistory[];
+  
+  @OneToMany(() => Feedback, (feedback) => feedback.user)
+  feedbacks: Feedback[];
 
 
 }

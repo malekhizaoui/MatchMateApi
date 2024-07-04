@@ -5,7 +5,7 @@ import { stadiumdRoutes } from './StadiumRoutes';
 import { timeSlotRoutes } from './TimeSlotRoutes';
 import { gameHistoryRoutes } from './GameHistoryRoutes';
 import { imageStadiumRoutes } from './ImageStadiumRoutes';
-
+import { feedbackRoutes } from './FeedbackRoutes';
 export const Routes = [
 	...AuthRoutes,
 	...userRoutes,
@@ -13,5 +13,6 @@ export const Routes = [
 	...stadiumdRoutes,
 	...timeSlotRoutes,
 	...gameHistoryRoutes,
-	...imageStadiumRoutes
+	...imageStadiumRoutes,
+	...feedbackRoutes
 ];
