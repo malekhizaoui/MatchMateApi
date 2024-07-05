@@ -9,7 +9,7 @@ import { ImageStadium } from "./entity/ImageStadium"
 import { Feedback } from "./entity/Feedback"
 export const AppDataSource = new DataSource({
     type: "postgres",
-    host: "localhost",
+    host: "16.171.175.193",
     port: 5432,
     username: "postgres",
     password: "jesuiskiller",
