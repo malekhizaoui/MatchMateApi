@@ -3,10 +3,40 @@ import { NextFunction, Request, Response } from "express";
 import { User } from "../entity/User";
 import { TimeSlot } from "../entity/TimeSlot";
 import * as bcrypt from "bcrypt";
+import { Stadium } from "../entity/Stadium";
 
 export class UserController {
   private userRepository = AppDataSource.getRepository(User);
   private timeSlotRepository = AppDataSource.getRepository(TimeSlot);
+  private stadiumRepository = AppDataSource.getRepository(Stadium)
+
+
+  async getStadiumsExcludingFeedback(request: Request, response: Response, next: NextFunction) {
+    try {
+        
+      const stadiumRepository = this.stadiumRepository;
+      const id = parseInt(request.params.id);
+      
+      const stadiums = await stadiumRepository.createQueryBuilder("stadium")
+      .innerJoin("stadium.gameHistories", "gameHistory")
+      .innerJoin("gameHistory.team", "user", "user.id = :id", { id })
+      .leftJoin("stadium.feedbacks", "feedback")
+      .leftJoin("feedback.user", "feedbackUser", "feedbackUser.id = :id", { id })
+      .where("feedbackUser.id IS NULL")
+      .getMany();
+        
+        response.send({
+          count: stadiums.length,
+          data: stadiums,
+        });
+    } catch (error) {
+      Error(error);
+      response.status(500).send(error);
+      }
+    
+  }
+  
+
 
   async getAllUsers(request: Request, response: Response, next: NextFunction) {
     try {
@@ -37,7 +67,8 @@ export class UserController {
         .leftJoinAndSelect("user.timeSlots", "timeSlot")
         .leftJoinAndSelect("timeSlot.stadium", "stadium")
         .leftJoinAndSelect("user.gameHistories", "gameHistory")
-
+        .leftJoinAndSelect("user.feedbacks", "feedback")
+        .leftJoinAndSelect("feedback.stadium", "stadiumFeedback")
         .where("user.id = :id", { id })
         .getOne();
 

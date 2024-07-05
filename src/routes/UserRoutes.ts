@@ -23,6 +23,15 @@ export const userRoutes = [
 		includeVerifyAdmin:false
 	},
 	{
+		method: 'get',
+		route: '/user/:id',
+		controller: UserController,
+		action: 'getStadiumsExcludingFeedback',
+		validation: [param('id').isInt()],
+		includeVerifyToken: false,
+		includeVerifyAdmin:false
+	},
+	{
 		method: 'put',
 		route: '/user/:id',
 		controller: UserController,
