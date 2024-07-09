@@ -49,9 +49,6 @@ export class AuthController {
       return res.status(500).json({ message: "Internal Server Error" });
     }
   }
-
-
-
   async connexion(request: Request, response: Response, next: NextFunction) {
     try {
       const { password } = request.body;
@@ -88,7 +85,6 @@ export class AuthController {
       return response.status(500).json({ message: "Internal Server Error" });
     }
   }
-
   async loginGoogle(request: Request, response: Response, next: NextFunction) {
 		const { tokenId } = request.body;
 		try {
@@ -134,6 +130,75 @@ export class AuthController {
 		} catch (err) {
 			Error(err);
 			response.status(500).send(err);
+		}
+	}
+  async resendCode(request: Request, response: Response, next: NextFunction) {
+		try {
+			const email = request.body;
+      console.log("email",email.email);
+      
+			let findUser = await this.userRepository.findOneBy({ email:email.email });
+
+			if (!findUser) {
+				response.send({
+					success: false,
+					message: "Veuillez Vous enregistrez à l'application tout d'abord",
+				});
+			} else {
+        const verificationCode=Math.floor(100000 + Math.random() * 900000)
+				findUser.code_verification = verificationCode;
+
+        await sendVerificationCode(email.email, verificationCode, findUser.firstName);
+
+				return await this.userRepository.save(findUser);
+			}
+		} catch (error) {
+			Error(error);
+			response.status(500).send(error);
+		}
+	}
+
+	async resetPassword(
+		request: Request,
+		response: Response,
+		next: NextFunction
+	) {
+		try {
+
+			const { newPassword, email } =
+				request.body;
+      console.log("email",email);
+      console.log("newPassword",newPassword);
+      
+			let findUser = await this.userRepository.findOneBy({
+				 email,
+			});
+
+			if (!findUser) {
+				response.send({
+					success: false,
+					message: "pas d'email liée à cet user!",
+				});
+			} else {
+				if (!findUser.is_verified) {
+					response.send({
+						success: false,
+						message: 'Veuillez revérifier votre adresse par le code envoyé!',
+					});
+				} else {
+				
+						const salt = await bcrypt.genSalt(10);
+						findUser.password = await bcrypt.hash(
+							newPassword,
+							salt
+						);
+						return this.userRepository.save(findUser);
+					
+				}
+			}
+		} catch (error) {
+			Error(error);
+			response.status(500).send(error);
 		}
 	}
 }

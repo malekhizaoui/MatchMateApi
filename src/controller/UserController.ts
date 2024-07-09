@@ -13,6 +13,8 @@ export class UserController {
 
 
   async getStadiumsExcludingFeedback(request: Request, response: Response, next: NextFunction) {
+    console.log("LQSBL?NBQSD?NBSQD?NB");
+    
     try {
       const userId = parseInt(request.params.id);
   

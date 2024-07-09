@@ -24,7 +24,7 @@ export const userRoutes = [
 	},
 	{
 		method: 'get',
-		route: '/user/:id',
+		route: '/userStadium/:id',
 		controller: UserController,
 		action: 'getStadiumsExcludingFeedback',
 		validation: [param('id').isInt()],

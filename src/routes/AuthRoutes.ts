@@ -2,16 +2,16 @@ import { param, body } from 'express-validator';
 import { AuthController } from '../controller/AuthController';
 
 export const AuthRoutes = [
-	// {
-	// 	method: 'put',
-	// 	route: '/resend/:email_utilisateur',
-	// 	controller: AuthController,
-	// 	action: 'resendCode',
-	// 	validation: [param('email_utilisateur').isEmail()],
-	// 	includeVerifyToken: false,
-	// 	includeVerifyAdmin:false
+	{
+		method: 'put',
+		route: '/resendCode',
+		controller: AuthController,
+		action: 'resendCode',
+		validation: [],
+		includeVerifyToken: false,
+		includeVerifyAdmin:false
 		
-	// },
+	},
 	// {
 	// 	method: 'delete',
 	// 	route: '/users/:id',
@@ -20,7 +20,6 @@ export const AuthRoutes = [
 	// 	validation: [param('id').isInt()],
 	// 	includeVerifyToken: false,
 	// 	includeVerifyAdmin:false
-		
 	// },
 	{
 		method: 'post',
@@ -59,16 +58,16 @@ export const AuthRoutes = [
 		includeVerifyAdmin:false
 		
 	},
-	// {
-	// 	method: 'put',
-	// 	route: '/resetpassword/:email',
-	// 	controller: AuthController,
-	// 	action: 'resetPassword',
-	// 	validation: [param('email').isEmail()],
-	// 	includeVerifyToken: false,
-	// 	includeVerifyAdmin:false
+	{
+		method: 'put',
+		route: '/resetpassword',
+		controller: AuthController,
+		action: 'resetPassword',
+		validation: [],
+		includeVerifyToken: false,
+		includeVerifyAdmin:false
 	
-	// },
+	},
 	// {
 	// 	method: 'post',
 	// 	route: '/user/google',
