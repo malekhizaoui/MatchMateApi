@@ -4,6 +4,7 @@ import { User } from "../entity/User";
 import { TimeSlot } from "../entity/TimeSlot";
 import * as bcrypt from "bcrypt";
 import { Stadium } from "../entity/Stadium";
+import * as qrcode from "qrcode";
 
 export class UserController {
   private userRepository = AppDataSource.getRepository(User);
@@ -12,9 +13,7 @@ export class UserController {
 
 
 
-  async getStadiumsExcludingFeedback(request: Request, response: Response, next: NextFunction) {
-    console.log("LQSBL?NBQSD?NBSQD?NB");
-    
+  async getStadiumsExcludingFeedback(request: Request, response: Response, next: NextFunction) {    
     try {
       const userId = parseInt(request.params.id);
   
@@ -49,12 +48,6 @@ export class UserController {
     }
   }
   
-  
-  
-  
-
-
-
   async getAllUsers(request: Request, response: Response, next: NextFunction) {
     try {
       const allUsers = await this.userRepository
@@ -103,78 +96,41 @@ export class UserController {
     }
   }
 
-  async updateUser(request: Request, response: Response, next: NextFunction) {
+  async updateUser(request: Request, response: Response) {
     try {
-      const id = parseInt(request.params.id);
-      const {
-        lastName,
-        firstName,
-        email,
-        code_verification,
-        is_verified,
-        password,
-        age,
-        hobbies,
-        image,
-        region,
-        timeSlotId,
-      } = request.body;
+      const userId = parseInt(request.params.id);
+      const { timeSlotId } = request.body;
 
-      let userToUpdate = await this.userRepository
-        .createQueryBuilder("user")
-        .leftJoinAndSelect("user.timeSlots", "timeSlot")
-        .where("user.id = :id", { id })
-        .getOne();
+      const user = await this.userRepository.findOne({
+        where: { id: userId },
+        relations: ['timeSlots'],
+      });
 
-      if (!userToUpdate) {
-        return response.status(400).json({
-          error: "User does not exist!!",
-        });
-      } else {
-        userToUpdate.lastName = lastName;
-        userToUpdate.firstName = firstName;
-        userToUpdate.email = email;
-        userToUpdate.code_verification = code_verification;
-        userToUpdate.is_verified = is_verified;
-        if (password) {
-          const saltRounds = 10;
-          userToUpdate.password = await bcrypt.hash(password, saltRounds);
-        }
-        userToUpdate.age = age;
-        userToUpdate.hobbies = hobbies;
-        userToUpdate.image = image;
-        userToUpdate.region = region;
-
-        // Initialize timeSlots if not already set
-        if (!userToUpdate.timeSlots) {
-          userToUpdate.timeSlots = [];
-        }
-
-        // Find and update the TimeSlot
-        const timeSlot = await this.timeSlotRepository.findOne({
-          where: { id: timeSlotId },
-        });
-
-        if (timeSlot) {
-          // Check if the user already has this timeSlot, and add it only if not present
-          if (
-            !userToUpdate.timeSlots.find(
-              (existingTimeSlot) => existingTimeSlot.id === timeSlot.id
-            )
-          ) {
-            userToUpdate.timeSlots.push(timeSlot); // Add the new TimeSlot to the existing ones
-          }
-        } else {
-          // Handle case where TimeSlot with the specified ID is not found
-          return response.status(400).json({
-            error: "TimeSlot does not exist!!",
-          });
-        }
-
-        await this.userRepository.save(userToUpdate);
-
-        response.send({ data: userToUpdate });
+      if (!user) {
+        return response.status(400).json({ error: 'User does not exist!' });
       }
+
+      const timeSlot = await this.timeSlotRepository.findOne({
+        where: { id: timeSlotId },
+        relations: ['stadium'],
+      });
+
+      if (!timeSlot) {
+        return response.status(400).json({ error: 'TimeSlot does not exist!' });
+      }
+
+      if (!user.timeSlots.includes(timeSlot)) {
+        user.timeSlots.push(timeSlot);
+      }
+
+      const qrData = `User: ${user.firstName} ${user.lastName}, TimeSlot: ${timeSlot.day} ${timeSlot.startTime}-${timeSlot.endTime}, Stadium: ${timeSlot.stadium.stadiumName}`;
+      const qrCodeUrl = await qrcode.toDataURL(qrData);
+      timeSlot.qrCodeUrl = qrCodeUrl;
+
+      await this.timeSlotRepository.save(timeSlot);
+      await this.userRepository.save(user);
+
+      response.json({ data: user, qrCodeUrl });
     } catch (error) {
       console.error(error);
       response.status(500).send(error);

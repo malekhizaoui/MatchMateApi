@@ -33,6 +33,9 @@ export class TimeSlot {
   @UpdateDateColumn()
   updated_at: Date;
 
+  @Column({ nullable: true })
+  qrCodeUrl: string; // Add this line
+  
   @ManyToMany(() => User, (user) => user.timeSlots, { cascade: ["remove"] })
   @JoinTable()
   team: User[];
