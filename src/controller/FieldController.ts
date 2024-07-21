@@ -144,15 +144,16 @@ async getFieldsByStadiumRegionFromBody(
   try {
     const { region } = request.params;
 
-    // Query the fields along with their stadiums based on the specified region
-    const fieldsWithStadiums = await this.fieldRepository
+    // Query the fields along with their stadiums and feedbacks based on the specified region
+    const fieldsWithStadiumsAndFeedbacks = await this.fieldRepository
       .createQueryBuilder("field")
       .innerJoinAndSelect("field.stadiums", "stadium", "stadium.Region = :region", { region })
+      .leftJoinAndSelect("stadium.feedbacks", "feedback")
       .orderBy("field.created_at", "ASC") // Order by created_at field in ascending order
       .getMany();
 
-    // Return the fields with their stadiums for the specified region
-    response.send(fieldsWithStadiums);
+    // Return the fields with their stadiums and feedbacks for the specified region
+    response.send(fieldsWithStadiumsAndFeedbacks);
   } catch (error) {
     console.error(error);
     response.status(500).send(error); // Send error response if any
