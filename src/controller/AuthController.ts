@@ -20,7 +20,10 @@ export class AuthController {
       // Check if the email is already registered
       const existingUser = await this.userRepository.findOneBy({ email });
       if (existingUser) {
-        return res.json({ message: "Email is already registered" });
+        console.log("ddddddd");
+
+        return res.send({sucess:false, message: "Email is already registered" });
+        
       }
       // Generate a verification code
       const verificationCode = Math.floor(100000 + Math.random() * 900000);
@@ -43,7 +46,7 @@ export class AuthController {
       await sendVerificationCode(email, verificationCode, firstName);
       return res
         .status(201)
-        .send({ message: "User registered successfully", user: newUser });
+        .send({sucess:true, message: "User registered successfully", user: newUser });
     } catch (error) {
       console.error("Error during user registration:", error);
       return res.status(500).json({ message: "Internal Server Error" });

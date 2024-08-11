@@ -3,12 +3,13 @@ import { NextFunction, Request, Response } from "express";
 import { Feedback } from "../entity/Feedback";
 import { User } from "../entity/User";
 import { Stadium } from "../entity/Stadium";
+import { GameHistory } from "../entity/GameHistory";
 
 export class FeedbackController {
   private feedbackRepository = AppDataSource.getRepository(Feedback);
   private userRepository = AppDataSource.getRepository(User);
   private stadiumRepository = AppDataSource.getRepository(Stadium);
-
+  private gameHistoryRepository=AppDataSource.getRepository(GameHistory)
   async getAllFeedbacks(request: Request, response: Response, next: NextFunction) {
     try {
       const allFeedbacks = await this.feedbackRepository
@@ -76,6 +77,22 @@ export class FeedbackController {
         });
       }
   
+      // Check if the user has played at the stadium
+      const hasPlayed = await this.gameHistoryRepository
+        .createQueryBuilder("gameHistory")
+        .leftJoinAndSelect("gameHistory.team", "user")
+        .where("gameHistory.stadiumId = :stadiumId", { stadiumId })
+        .andWhere("user.id = :userId", { userId })
+        .getCount();
+  
+      if (hasPlayed === 0) {
+        return response.send({
+          success: false,
+          message: "User has not played at this stadium and cannot submit feedback.",
+        });
+      }
+  
+      // Create and save feedback
       const feedback = new Feedback();
       feedback.stars = stars;
       feedback.comment = comment;
@@ -90,6 +107,7 @@ export class FeedbackController {
       response.status(500).send(error);
     }
   }
+   
   
 
   async updateFeedback(request: Request, response: Response, next: NextFunction) {
