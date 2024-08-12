@@ -149,7 +149,7 @@ async getFieldsByStadiumRegionFromBody(
       .createQueryBuilder("field")
       .innerJoinAndSelect("field.stadiums", "stadium", "stadium.Region = :region", { region })
       .leftJoinAndSelect("stadium.feedbacks", "feedback")
-      .orderBy("field.created_at", "ASC") // Order by created_at field in ascending order
+      .orderBy("field.created_at", "ASC") 
       .getMany();
 
     // Return the fields with their stadiums and feedbacks for the specified region
